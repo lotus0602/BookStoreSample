@@ -27,9 +27,12 @@ fun BookStoreNavHost(
         composable(
             route = BookStoreDestinations.BOOK_LIST
         ) {
-            BookListScreen(navigateToDetails = {
-                navController.navigate(BookStoreDestinations.BOOK_DETAILS)
-            })
+            BookListScreen(
+                onSearch = { search -> },
+                navigateToDetails = {
+                    navController.navigate(BookStoreDestinations.BOOK_DETAILS)
+                }
+            )
         }
         composable(
             route = BookStoreDestinations.BOOK_DETAILS
