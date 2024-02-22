@@ -47,6 +47,7 @@ sealed interface ListType {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookListScreen(
+    data: List<Book>,
     onSearch: (search: String) -> Unit,
     navigateToDetails: () -> Unit,
     modifier: Modifier = Modifier
@@ -91,6 +92,7 @@ fun BookListScreen(
         }
 
         BookList(
+            data = data,
             listType = listType,
             navigateToDetails = navigateToDetails,
             modifier = modifier
@@ -102,6 +104,10 @@ fun BookListScreen(
 @Composable
 fun BookListScreenPreview() {
     BookListScreen(
+        data = listOf(
+            Book("", "title", "sub title", "price"),
+            Book("", "title", "sub title", "price"),
+        ),
         onSearch = { },
         navigateToDetails = {}
     )
@@ -109,6 +115,7 @@ fun BookListScreenPreview() {
 
 @Composable
 fun BookList(
+    data: List<Book>,
     listType: ListType,
     navigateToDetails: () -> Unit,
     modifier: Modifier = Modifier
@@ -116,12 +123,7 @@ fun BookList(
     when (listType) {
         ListType.List -> {
             LazyColumn(modifier.fillMaxSize()) {
-                items(
-                    listOf(
-                        Book("", "title", "sub title", "price"),
-                        Book("", "title", "sub title", "price"),
-                    )
-                ) { item ->
+                items(data) { item ->
                     BookListItem(data = item, onClickItem = navigateToDetails)
                 }
             }
@@ -129,12 +131,7 @@ fun BookList(
 
         ListType.Grid -> {
             LazyVerticalGrid(columns = GridCells.Fixed(3)) {
-                items(
-                    listOf(
-                        Book("", "title", "sub title", "price"),
-                        Book("", "title", "sub title", "price"),
-                    )
-                ) { item ->
+                items(data) { item ->
                     BookGridItem(data = item, onClickItem = navigateToDetails)
                 }
             }
@@ -146,6 +143,10 @@ fun BookList(
 @Composable
 fun BookListPreview() {
     BookList(
+        data = listOf(
+            Book("", "title", "sub title", "price"),
+            Book("", "title", "sub title", "price"),
+        ),
         listType = ListType.List,
         navigateToDetails = {}
     )

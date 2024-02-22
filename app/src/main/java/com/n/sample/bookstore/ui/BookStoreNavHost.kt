@@ -2,9 +2,12 @@ package com.n.sample.bookstore.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.n.sample.bookstore.BookStoreViewModel
 import com.n.sample.bookstore.ui.screen.BookDetailsScreen
 import com.n.sample.bookstore.ui.screen.BookListScreen
 
@@ -27,7 +30,10 @@ fun BookStoreNavHost(
         composable(
             route = BookStoreDestinations.BOOK_LIST
         ) {
+            val viewModel: BookStoreViewModel = hiltViewModel()
+            val data = viewModel.bookList.collectAsStateWithLifecycle()
             BookListScreen(
+                data = data.value,
                 onSearch = { search -> },
                 navigateToDetails = {
                     navController.navigate(BookStoreDestinations.BOOK_DETAILS)
