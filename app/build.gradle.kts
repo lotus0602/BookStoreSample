@@ -76,6 +76,10 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:$navVersion")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
+    val pagingVersion = "3.2.1"
+    implementation("androidx.paging:paging-runtime-ktx:$pagingVersion")
+    implementation("androidx.paging:paging-compose:$pagingVersion")
+
     // Hilt
     val hiltVersion = "2.50"
     implementation("com.google.dagger:hilt-android:$hiltVersion")

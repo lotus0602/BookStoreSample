@@ -10,4 +10,13 @@ data class BookDTO(
     val subtitle: String,
     val title: String,
     val url: String
-) : BaseDTO()
+) : BaseDTO() {
+
+    fun toBook(): Book =
+        Book(
+            image = image,
+            title = title,
+            subTitle = subtitle,
+            price = price
+        )
+}

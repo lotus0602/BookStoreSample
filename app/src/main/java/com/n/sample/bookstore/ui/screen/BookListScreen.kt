@@ -16,8 +16,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.MoreVert
@@ -36,8 +34,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import com.n.sample.bookstore.model.Book
+import kotlinx.coroutines.flow.flowOf
 
 sealed interface ListType {
     object List : ListType
@@ -47,12 +49,12 @@ sealed interface ListType {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookListScreen(
-    data: List<Book>,
+    searchText: String,
+    books: LazyPagingItems<Book>,
     onSearch: (search: String) -> Unit,
     navigateToDetails: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var searchText by remember { mutableStateOf("") }
     var listType by remember { mutableStateOf<ListType>(ListType.List) }
 
     Column {
@@ -64,10 +66,7 @@ fun BookListScreen(
         ) {
             TextField(
                 value = searchText,
-                onValueChange = {
-                    searchText = it
-                    onSearch(it)
-                },
+                onValueChange = { onSearch(it) },
                 modifier = modifier.weight(1f)
             )
             Spacer(modifier = modifier.width(10.dp))
@@ -92,7 +91,7 @@ fun BookListScreen(
         }
 
         BookList(
-            data = data,
+            books = books,
             listType = listType,
             navigateToDetails = navigateToDetails,
             modifier = modifier
@@ -103,11 +102,18 @@ fun BookListScreen(
 @Preview
 @Composable
 fun BookListScreenPreview() {
+    val books = flowOf(
+        PagingData.from(
+            listOf(
+                Book("", "title", "sub title", "price"),
+                Book("", "title", "sub title", "price"),
+            )
+        )
+    ).collectAsLazyPagingItems()
+
     BookListScreen(
-        data = listOf(
-            Book("", "title", "sub title", "price"),
-            Book("", "title", "sub title", "price"),
-        ),
+        searchText = "",
+        books = books,
         onSearch = { },
         navigateToDetails = {}
     )
@@ -115,7 +121,7 @@ fun BookListScreenPreview() {
 
 @Composable
 fun BookList(
-    data: List<Book>,
+    books: LazyPagingItems<Book>,
     listType: ListType,
     navigateToDetails: () -> Unit,
     modifier: Modifier = Modifier
@@ -123,16 +129,20 @@ fun BookList(
     when (listType) {
         ListType.List -> {
             LazyColumn(modifier.fillMaxSize()) {
-                items(data) { item ->
-                    BookListItem(data = item, onClickItem = navigateToDetails)
+                items(books.itemCount) { index ->
+                    books[index]?.let { item ->
+                        BookListItem(data = item, onClickItem = navigateToDetails)
+                    }
                 }
             }
         }
 
         ListType.Grid -> {
             LazyVerticalGrid(columns = GridCells.Fixed(3)) {
-                items(data) { item ->
-                    BookGridItem(data = item, onClickItem = navigateToDetails)
+                items(books.itemCount) { index ->
+                    books[index]?.let { item ->
+                        BookGridItem(data = item, onClickItem = navigateToDetails)
+                    }
                 }
             }
         }
@@ -142,11 +152,17 @@ fun BookList(
 @Preview
 @Composable
 fun BookListPreview() {
+    val books = flowOf(
+        PagingData.from(
+            listOf(
+                Book("", "title", "sub title", "price"),
+                Book("", "title", "sub title", "price"),
+            )
+        )
+    ).collectAsLazyPagingItems()
+
     BookList(
-        data = listOf(
-            Book("", "title", "sub title", "price"),
-            Book("", "title", "sub title", "price"),
-        ),
+        books = books,
         listType = ListType.List,
         navigateToDetails = {}
     )

@@ -7,7 +7,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.n.sample.bookstore.BookStoreViewModel
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.n.sample.bookstore.ui.screen.BookDetailsScreen
 import com.n.sample.bookstore.ui.screen.BookListScreen
 
@@ -31,10 +31,13 @@ fun BookStoreNavHost(
             route = BookStoreDestinations.BOOK_LIST
         ) {
             val viewModel: BookStoreViewModel = hiltViewModel()
-            val data = viewModel.bookList.collectAsStateWithLifecycle()
+            val searchText = viewModel.searchText.collectAsStateWithLifecycle()
+            val books = viewModel.books.collectAsLazyPagingItems()
+
             BookListScreen(
-                data = data.value,
-                onSearch = { search -> },
+                searchText = searchText.value,
+                books = books,
+                onSearch = viewModel::onChangeSearchText,
                 navigateToDetails = {
                     navController.navigate(BookStoreDestinations.BOOK_DETAILS)
                 }

@@ -10,7 +10,7 @@ interface BookStoreService {
     @GET("search/{query}/{page}")
     suspend fun searchBooks(
         @Path("query") query: String,
-        @Path("page") page: Int = 0,
+        @Path("page") page: Int = DEFAULT_PAGE,
     ): BookListDTO
 
     @GET("new")
