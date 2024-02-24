@@ -17,6 +17,7 @@ data class BookDTO(
             image = image,
             title = title,
             subTitle = subtitle,
-            price = price
+            price = price,
+            isbn13 = isbn13
         )
 }

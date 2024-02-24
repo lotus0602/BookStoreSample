@@ -52,7 +52,7 @@ fun BookListScreen(
     searchText: String,
     books: LazyPagingItems<Book>,
     onSearch: (search: String) -> Unit,
-    navigateToDetails: () -> Unit,
+    navigateToDetails: (isbn13: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var listType by remember { mutableStateOf<ListType>(ListType.List) }
@@ -123,7 +123,7 @@ fun BookListScreenPreview() {
 fun BookList(
     books: LazyPagingItems<Book>,
     listType: ListType,
-    navigateToDetails: () -> Unit,
+    navigateToDetails: (isbn13: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     when (listType) {
@@ -131,7 +131,10 @@ fun BookList(
             LazyColumn(modifier.fillMaxSize()) {
                 items(books.itemCount) { index ->
                     books[index]?.let { item ->
-                        BookListItem(data = item, onClickItem = navigateToDetails)
+                        BookListItem(
+                            data = item,
+                            onClickItem = { navigateToDetails(item.isbn13) }
+                        )
                     }
                 }
             }
@@ -141,7 +144,10 @@ fun BookList(
             LazyVerticalGrid(columns = GridCells.Fixed(3)) {
                 items(books.itemCount) { index ->
                     books[index]?.let { item ->
-                        BookGridItem(data = item, onClickItem = navigateToDetails)
+                        BookGridItem(
+                            data = item,
+                            onClickItem = { navigateToDetails(item.isbn13) }
+                        )
                     }
                 }
             }

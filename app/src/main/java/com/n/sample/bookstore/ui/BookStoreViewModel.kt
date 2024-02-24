@@ -9,6 +9,8 @@ import androidx.paging.cachedIn
 import com.n.sample.bookstore.api.BookPagingSource
 import com.n.sample.bookstore.api.BookStoreRepository
 import com.n.sample.bookstore.model.Book
+import com.n.sample.bookstore.model.BookDetails
+import com.n.sample.bookstore.model.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,6 +32,9 @@ class BookStoreViewModel @Inject constructor(
 
     private val _searchText = MutableStateFlow("")
     val searchText = _searchText.asStateFlow()
+
+    private val _bookDetails = MutableStateFlow(BookDetails())
+    val bookDetails = _bookDetails.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -64,5 +69,23 @@ class BookStoreViewModel @Inject constructor(
 
     fun onChangeSearchText(text: String) {
         _searchText.value = text
+    }
+
+    fun fetchBookDetails(isbn13: String?) {
+        viewModelScope.launch {
+
+            if (isbn13.isNullOrEmpty()) return@launch
+
+            val result = bookStoreRepository.getBookDetails(isbn13)
+            when (result) {
+                is Result.Error -> {
+
+                }
+
+                is Result.Success -> {
+                    _bookDetails.value = result.data.toBookDetails()
+                }
+            }
+        }
     }
 }

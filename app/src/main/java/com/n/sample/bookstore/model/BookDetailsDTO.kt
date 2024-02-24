@@ -18,5 +18,22 @@ data class BookDetailsDTO(
     val price: String,
     val image: String,
     val url: String,
-    val pdf: List<String>
-) : BaseDTO()
+    val pdf: Map<String, String> = emptyMap()
+) : BaseDTO() {
+
+    fun toBookDetails(): BookDetails =
+        BookDetails(
+            title = title,
+            subtitle = subtitle,
+            authors = authors,
+            publisher = publisher,
+            language = language,
+            pages = pages,
+            year = year,
+            rating = rating,
+            desc = desc,
+            price = price,
+            image = image,
+            pdf = pdf
+        )
+}
