@@ -2,6 +2,7 @@ package com.n.sample.bookstore.ui.screen
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -24,7 +25,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,8 +36,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -57,44 +63,62 @@ fun BookListScreen(
 ) {
     var listType by remember { mutableStateOf<ListType>(ListType.List) }
 
-    Column {
-        Row(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            TextField(
-                value = searchText,
-                onValueChange = { onSearch(it) },
-                modifier = modifier.weight(1f)
-            )
-            Spacer(modifier = modifier.width(10.dp))
-
-            Button(onClick = {
-                listType = when (listType) {
-                    ListType.List -> {
-                        ListType.Grid
-                    }
-
-                    ListType.Grid -> {
-                        ListType.List
-                    }
-                }
-            }) {
-                val icon = when (listType) {
-                    ListType.List -> Icons.Default.MoreVert
-                    ListType.Grid -> Icons.Default.List
-                }
-                Icon(imageVector = icon, contentDescription = null)
-            }
+    val refreshState = rememberPullToRefreshState()
+    if (refreshState.isRefreshing) {
+        LaunchedEffect(true) {
+            books.refresh()
         }
+    }
+    LaunchedEffect(books.loadState.refresh) {
+        if (books.loadState.refresh is LoadState.NotLoading) {
+            refreshState.endRefresh()
+        }
+    }
 
-        BookList(
-            books = books,
-            listType = listType,
-            navigateToDetails = navigateToDetails,
-            modifier = modifier
+    Box(modifier = modifier.nestedScroll(refreshState.nestedScrollConnection)) {
+        Column {
+            Row(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextField(
+                    value = searchText,
+                    onValueChange = { onSearch(it) },
+                    modifier = modifier.weight(1f)
+                )
+                Spacer(modifier = modifier.width(10.dp))
+
+                Button(onClick = {
+                    listType = when (listType) {
+                        ListType.List -> {
+                            ListType.Grid
+                        }
+
+                        ListType.Grid -> {
+                            ListType.List
+                        }
+                    }
+                }) {
+                    val icon = when (listType) {
+                        ListType.List -> Icons.Default.MoreVert
+                        ListType.Grid -> Icons.Default.List
+                    }
+                    Icon(imageVector = icon, contentDescription = null)
+                }
+            }
+
+            BookList(
+                books = books,
+                listType = listType,
+                navigateToDetails = navigateToDetails,
+                modifier = modifier
+            )
+        }
+        PullToRefreshContainer(
+            modifier = modifier.align(Alignment.TopCenter),
+            state = refreshState
         )
     }
 }
