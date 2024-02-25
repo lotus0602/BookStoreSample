@@ -1,4 +1,4 @@
-package com.n.sample.bookstore.model
+package com.n.sample.bookstore.domain.model
 
 data class BookDetails(
     val title: String = "",

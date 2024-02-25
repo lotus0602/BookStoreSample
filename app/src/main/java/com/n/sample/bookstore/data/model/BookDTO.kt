@@ -1,5 +1,6 @@
-package com.n.sample.bookstore.model
+package com.n.sample.bookstore.data.model
 
+import com.n.sample.bookstore.domain.model.Book
 import kotlinx.serialization.Serializable
 
 @Serializable

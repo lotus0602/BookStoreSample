@@ -13,6 +13,7 @@ import androidx.navigation.navArgument
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.n.sample.bookstore.ui.screen.BookDetailsScreen
 import com.n.sample.bookstore.ui.screen.BookListScreen
+import com.n.sample.bookstore.ui.screen.BookStoreViewModel
 
 object BookStoreDestinations {
     const val BOOK_LIST = "BOOK_LIST"

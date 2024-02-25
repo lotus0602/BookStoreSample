@@ -26,7 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.n.sample.bookstore.model.BookDetails
+import com.n.sample.bookstore.domain.model.BookDetails
 
 @Composable
 fun BookDetailsScreen(

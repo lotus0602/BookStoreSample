@@ -1,4 +1,4 @@
-package com.n.sample.bookstore.model
+package com.n.sample.bookstore.data.model
 
 import kotlinx.serialization.Serializable
 

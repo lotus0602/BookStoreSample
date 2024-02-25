@@ -1,21 +1,18 @@
-package com.n.sample.bookstore.ui
+package com.n.sample.bookstore.ui.screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.n.sample.bookstore.api.BookNewReleasePagingSource
-import com.n.sample.bookstore.api.BookSearchPagingSource
-import com.n.sample.bookstore.api.BookStoreRepository
-import com.n.sample.bookstore.model.Book
-import com.n.sample.bookstore.model.BookDetails
-import com.n.sample.bookstore.model.Result
+import com.n.sample.bookstore.data.repository.BookStoreRepositoryImpl
+import com.n.sample.bookstore.domain.model.Book
+import com.n.sample.bookstore.domain.model.BookDetails
+import com.n.sample.bookstore.domain.model.Result
+import com.n.sample.bookstore.domain.usecase.NewReleaseBooksUseCase
+import com.n.sample.bookstore.domain.usecase.SearchBooksUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,7 +26,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BookStoreViewModel @Inject constructor(
-    private val bookStoreRepository: BookStoreRepository
+    private val bookStoreRepository: BookStoreRepositoryImpl,
+    private val newReleaseBooksUseCase: NewReleaseBooksUseCase,
+    private val searchBooksUseCase: SearchBooksUseCase
 ) : ViewModel() {
     private val _books = MutableStateFlow<PagingData<Book>>(PagingData.empty())
     val books: StateFlow<PagingData<Book>> = _books.asStateFlow()
@@ -42,7 +41,7 @@ class BookStoreViewModel @Inject constructor(
 
     init {
         observeSearchText()
-        fetchNewReleaseBoos()
+        fetchNewReleaseBooks()
     }
 
     fun onChangeSearchText(text: String) {
@@ -56,29 +55,19 @@ class BookStoreViewModel @Inject constructor(
                 .debounce(1_000L)
                 .filter { it.isNotEmpty() }
                 .distinctUntilChanged()
-                .flatMapLatest {
-                    getSearchBoosPagingData(it)
+                .flatMapLatest { query ->
+                    searchBooksUseCase(query).cachedIn(viewModelScope)
                 }.collectLatest {
                     _books.value = it
                 }
         }
     }
 
-    private fun getSearchBoosPagingData(text: String): Flow<PagingData<Book>> =
-        Pager(
-            config = PagingConfig(pageSize = 10, initialLoadSize = 20),
-            pagingSourceFactory = {
-                BookSearchPagingSource(text, bookStoreRepository)
-            }
-        ).flow.cachedIn(viewModelScope)
-
-    private fun fetchNewReleaseBoos() {
+    private fun fetchNewReleaseBooks() {
         viewModelScope.launch {
-            Pager(
-                config = PagingConfig(pageSize = 20),
-                pagingSourceFactory = { BookNewReleasePagingSource(bookStoreRepository) }
-            ).flow.cachedIn(viewModelScope)
-                .collect {
+            newReleaseBooksUseCase()
+                .cachedIn(viewModelScope)
+                .collectLatest {
                     _books.value = it
                 }
         }
@@ -86,7 +75,6 @@ class BookStoreViewModel @Inject constructor(
 
     fun fetchBookDetails(isbn13: String?) {
         viewModelScope.launch {
-
             if (isbn13.isNullOrEmpty()) return@launch
 
             val result = bookStoreRepository.getBookDetails(isbn13)
@@ -96,7 +84,7 @@ class BookStoreViewModel @Inject constructor(
                 }
 
                 is Result.Success -> {
-                    _bookDetails.value = result.data.toBookDetails()
+                    _bookDetails.value = result.data
                 }
             }
         }

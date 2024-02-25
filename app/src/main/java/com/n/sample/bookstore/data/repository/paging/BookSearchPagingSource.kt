@@ -1,9 +1,11 @@
-package com.n.sample.bookstore.api
+package com.n.sample.bookstore.data.repository.paging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.n.sample.bookstore.model.Book
-import com.n.sample.bookstore.model.Result
+import com.n.sample.bookstore.data.api.DEFAULT_PAGE
+import com.n.sample.bookstore.domain.model.Book
+import com.n.sample.bookstore.domain.model.Result
+import com.n.sample.bookstore.domain.repository.BookStoreRepository
 
 class BookSearchPagingSource(
     private val searchText: String,
@@ -25,12 +27,11 @@ class BookSearchPagingSource(
                 }
 
                 is Result.Success -> {
-                    val prevKey = if (currentPage == DEFAULT_PAGE) null else currentPage - 1
-                    val nextKey =
-                        if (response.data.books.isEmpty()) null else response.data.page + 1
+                    val prevKey = if (currentPage == DEFAULT_PAGE) null else currentPage.minus(1)
+                    val nextKey = if (response.data.isEmpty()) null else currentPage.plus(1)
 
                     LoadResult.Page(
-                        data = response.data.books.map { it.toBook() },
+                        data = response.data,
                         prevKey = prevKey,
                         nextKey = nextKey
                     )

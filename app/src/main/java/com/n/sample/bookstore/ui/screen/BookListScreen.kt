@@ -44,7 +44,7 @@ import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
-import com.n.sample.bookstore.model.Book
+import com.n.sample.bookstore.domain.model.Book
 import kotlinx.coroutines.flow.flowOf
 
 sealed interface ListType {

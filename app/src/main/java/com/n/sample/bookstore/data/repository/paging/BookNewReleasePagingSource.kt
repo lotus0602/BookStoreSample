@@ -1,9 +1,11 @@
-package com.n.sample.bookstore.api
+package com.n.sample.bookstore.data.repository.paging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.n.sample.bookstore.model.Book
-import com.n.sample.bookstore.model.Result
+import com.n.sample.bookstore.data.api.DEFAULT_PAGE
+import com.n.sample.bookstore.domain.model.Book
+import com.n.sample.bookstore.domain.model.Result
+import com.n.sample.bookstore.domain.repository.BookStoreRepository
 
 class BookNewReleasePagingSource(
     private val bookStoreRepository: BookStoreRepository
@@ -24,7 +26,7 @@ class BookNewReleasePagingSource(
 
                 is Result.Success -> {
                     LoadResult.Page(
-                        data = response.data.books.map { it.toBook() },
+                        data = response.data,
                         prevKey = null,
                         nextKey = null
                     )

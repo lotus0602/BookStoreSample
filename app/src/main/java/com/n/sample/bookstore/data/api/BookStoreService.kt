@@ -1,7 +1,7 @@
-package com.n.sample.bookstore.api
+package com.n.sample.bookstore.data.api
 
-import com.n.sample.bookstore.model.BookDetailsDTO
-import com.n.sample.bookstore.model.BookListDTO
+import com.n.sample.bookstore.data.model.BookDetailsDTO
+import com.n.sample.bookstore.data.model.BookListDTO
 import retrofit2.http.GET
 import retrofit2.http.Path
 
