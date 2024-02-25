@@ -109,12 +109,14 @@ fun BookListScreen(
                 }
             }
 
-            BookList(
-                books = books,
-                listType = listType,
-                navigateToDetails = navigateToDetails,
-                modifier = modifier
-            )
+            if (!refreshState.isRefreshing) {
+                BookList(
+                    books = books,
+                    listType = listType,
+                    navigateToDetails = navigateToDetails,
+                    modifier = modifier
+                )
+            }
         }
         PullToRefreshContainer(
             modifier = modifier.align(Alignment.TopCenter),
